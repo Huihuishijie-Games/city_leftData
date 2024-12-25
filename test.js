@@ -120,3 +120,31 @@ function conditionType(condition) {
     return info
 }
 
+
+function getEventProbabilities(events) {
+    // const probabilities = {};
+    let eventIds = []
+    let probabilities = []
+    for (let event of events) {
+        let arr = `${event}`.split('*')
+        eventIds.push(Number(arr[0]))
+        if (arr[1]) {
+            probabilities.push(Number(arr[1]))
+        } else {
+            probabilities.push(1)
+        }
+    }
+    return {
+        eventIds,
+        probabilities
+    };
+}
+
+const ageJson = require("./output.json")
+const eventJson = require("./outputEvent.json")
+
+// let event = getEventProbabilities(ageJson[2].events)
+
+
+
+console.log(event)

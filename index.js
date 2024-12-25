@@ -170,14 +170,15 @@ function conditionFun(condition) {
                 }
             }
         } else {
-            console.log(conditions[i])
+            // console.log(conditions[i])
         }
 
     }
     return arr;
 
 }
-let eventId = []
+let allEventId = []
+
 for (var i = 0; i <= 24; i++) {
     let data = getAgeData(i);
     let events = []
@@ -186,33 +187,8 @@ for (var i = 0; i <= 24; i++) {
         return;
     }
     for (var j = 0; j < data.event.length; j++) {
-        let id = getId(data.event[j])
-        let eventData = eventJson[id]
-        // console.log(eventData);
-        let includes = conditionFun(eventData.include)
-        let includeStr = eventData.include
-        if (includes.length) {
-            includeStr = "EVT?" + JSON.stringify(includes)
-        } else {
-            includeStr = undefined
-        }
 
-        let excludes = conditionFun(eventData.exclude)
-        let excludeStr = eventData.exclude
-        if (excludes.length) {
-            excludeStr = "EVT?" + JSON.stringify(excludes)
-        } else {
-            excludeStr = undefined
-        }
-        // console.log(includes)
-        if (!outputEventJson[id]) {
-            outputEventJson[id] = {
-                id: id,
-                event: eventData.event,
-                include: includeStr,
-                exclude: excludeStr
-            }
-        }
+        let id = getId(data.event[j])
         // events.push({
         //     id: id,
         //     p: getP(data.event[j])
@@ -227,16 +203,61 @@ for (var i = 0; i <= 24; i++) {
         // } else {
         //     eventId.push(id)
         // }
-
+        allEventId.push(id)
     }
     outputJson[i] = {
         events: events
     }
 }
+for (var i = 0; i <= 24; i++) {
+    let data = getAgeData(i);
+    if (!data.event) {
+        console.log(data, i)
+        return;
+    }
+    for (var j = 0; j < data.event.length; j++) {
+        let id = getId(data.event[j])
+        let eventData = eventJson[id]
+        // console.log(eventData);
+        let includes = conditionFun(eventData.include)
+        let includeStr = eventData.include
+        for (var k = 0; k < includes.length; k++) {
+            let id2 = includes[k] + ""
+            if (allEventId.indexOf(id2) === -1) {
+                includes.splice(k, 1)
+                k--;
+            }
+
+        }
+        if (includes.length) {
+            includeStr = "lifeEvt?" + JSON.stringify(includes)
+        } else {
+            includeStr = undefined
+        }
+
+        let excludes = conditionFun(eventData.exclude)
+        let excludeStr = eventData.exclude
+        if (excludes.length) {
+            excludeStr = "lifeEvt?" + JSON.stringify(excludes)
+        } else {
+            excludeStr = undefined
+        }
+        // console.log(includes)
+        if (!outputEventJson[id]) {
+            outputEventJson[id] = {
+                id: id,
+                event: eventData.event,
+                include: includeStr,
+                exclude: excludeStr
+            }
+        }
+    }
+}
+
 
 
 // let d = parseCondition(`(CHR>3)&(MNY<5)&(EVT?[10199,10200,10184])`)
 // console.log(d)
-fs.writeFileSync("./output.json", JSON.stringify(outputJson, 2, 2))
-fs.writeFileSync("./outputEvent.json", JSON.stringify(outputEventJson, 2, 2))
+fs.writeFileSync("./workAge.json", JSON.stringify(outputJson, 2, 2))
+fs.writeFileSync("./workEvents.json", JSON.stringify(outputEventJson, 2, 2))
 // console.log(outputJson);
